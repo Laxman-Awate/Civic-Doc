@@ -1,0 +1,9 @@
+<html>
+<body>
+<h2>Right to Information (RTI) Application</h2>
+<p>Date: {{ req.get('date') or '' }}</p>
+<p>To: Public Information Officer</p>
+<p>Subject: Request for information regarding complaint ID {{ req.get('complaint_id') }}</p>
+<p>Details: Please provide the following information...</p>
+</body>
+</html>

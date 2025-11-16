@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+motor
+pydantic
+python-multipart
+pymupdf
+pytesseract
+pillow
+spacy
+nltk
+scikit-learn
+xgboost
+jinja2
+python-dotenv
+pyyaml
