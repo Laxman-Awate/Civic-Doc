@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTI Document - CivicDoc</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #1976d2; /* Darker Blue for documents */
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --section-bg: #ffffff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --ai-insight-bg: #e3f2fd; /* Lightest Blue */
+            --ai-insight-border: #90caf9; /* Medium Blue */
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            line-height: 1.7; 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 30px; 
+            background-color: var(--light-bg); 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container { 
+            max-width: 850px; 
+            margin: auto; 
+            background: var(--section-bg); 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 20px var(--shadow-color); 
+            border: 1px solid var(--border-color);
+        }
+        h1 { 
+            color: var(--primary-color); 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid var(--primary-color); 
+            padding-bottom: 15px; 
+            font-size: 2.2em; 
+            font-weight: 700;
+        }
+        h2 { 
+            color: var(--primary-color); 
+            margin-top: 35px; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 8px; 
+            font-size: 1.6em; 
+            font-weight: 500;
+        }
+        p { margin-bottom: 0px; line-height: 1.2; }
+        .detail-item { margin-bottom: 0px; font-size: 1.0em; }
+        .label { font-weight: bold; color: #555; margin-right: 5px; }
+        
+        .ai-insight {
+            background-color: var(--ai-insight-bg); 
+            border-left: 6px solid var(--ai-insight-border); 
+            padding: 15px 20px; 
+            margin-top: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .ai-insight h3 {
+            color: var(--primary-color); /* Blue for AI insights title */
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+        }
+        .ai-insight p { margin: 3px 0; }
+        .ai-insight ul { list-style-type: none; margin-left: 0; padding-left: 0; }
+        .ai-insight ul li { margin-bottom: 0px; padding-left: 25px; position: relative; font-size: 0.95em; line-height: 1.2; }
+        .ai-insight ul li::before {
+            content: '\2022'; /* Bullet point */
+            color: var(--primary-color); /* Use primary color for bullets */
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-weight: bold;
+        }
+        .rule-text { font-weight: bold; color: #3f51b5; /* Deeper blue for rule text */ }
+        .rule-keywords { font-style: italic; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Right to Information (RTI) Application</h1>
+
+        <p class="detail-item">To,</p>
+        <p class="detail-item"><span class="label">The Public Information Officer (PIO)</span></p>
+        <p class="detail-item">{{ department_name }}</p>
+        <p class="detail-item">{{ office_address }}</p>
+
+        <p class="detail-item" style="margin-top: 8px;"><span class="label">Subject:</span> Request for Information under the RTI Act, 2005</p>
+
+        <p class="detail-item" style="margin-top: 8px;">Respected Sir/Madam,</p>
+
+        <p class="detail-item" style="margin-top: 8px;">I, <span class="label">{{ applicant_name }}</span>, a resident of <span class="label">{{ address }}</span>, request the following information under the Right to Information Act, 2005:</p>
+
+        <ol style="margin-top: 5px; margin-bottom: 5px;">
+            {% for item in information_sought.split('\n') %}
+                {% if item.strip() %}
+                    <li style="margin-bottom: 0px;">{{ item.strip() }}</li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+
+        <p class="detail-item">I have enclosed an RTI fee of Rs. 10 through [IPO/Court Fee Stamp/Online Payment].</p>
+
+        <p class="detail-item" style="margin-top: 5px;">I declare that I am an Indian citizen and the information sought does not fall under Section 8 or 9 of the RTI Act.</p>
+
+        <p class="detail-item" style="margin-top: 8px;">Thank you.</p>
+
+        <p class="detail-item" style="margin-top: 8px;">Yours sincerely,</p>
+
+        <p class="detail-item"><span class="label">{{ applicant_name }}</span></p>
+        <p class="detail-item"><span class="label">{{ address }}</span></p>
+        <p class="detail-item">[Phone/Email]</p>
+        <p class="detail-item"><span class="label">Date:</span> {{ generated_at.strftime('%Y-%m-%d') }}</p>
+
+        {% if circular_id %}
+        <div class="ai-insight">
+            <h3>AI-Powered Insights from Circular (ID: {{ circular_id }})</h3>
+            {% if circular_summary %}<p class="detail-item"><span class="label">Circular Summary:</span> {{ circular_summary }}</p>{% endif %}
+            {% if extracted_rules %}
+            <p class="detail-item"><span class="label">Extracted Rules:</span></p>
+            <ul>
+                {% for rule in extracted_rules %}
+                <li><span class="rule-text">{{ rule.rule_text }}</span> {% if rule.keywords %}<span class="rule-keywords">(Keywords: {{ rule.keywords | join(', ') }})</span>{% endif %}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+

@@ -1,10 +1,22 @@
-import motor.motor_asyncio
-from .config import settings
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from .models.sql_models import Base
 
+# SQLite connection string
+# The database file will be created in the project root
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
-client = motor.motor_asyncio.AsyncIOMotorClient(settings.mongodb_uri)
-db = client[settings.mongodb_db]
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
-# convenience collections
-complaints_col = db.get_collection("complaints")
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

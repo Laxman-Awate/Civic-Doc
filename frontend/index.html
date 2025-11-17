@@ -1,19 +1,266 @@
-<!doctype html>
- <html>
+<!DOCTYPE html>
+<html lang="en">
  <head>
- <meta charset="utf-8" />
- <title>CivicDoc — Demo</title>
- <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicDoc - AI-Powered Public Issue Prioritization</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap">
+    <link rel="stylesheet" href="/static/css/styles.css">
  </head>
- 9
 <body>
- <h1>CivicDoc — Submit Complaint</h1>
- <textarea id="message" rows="6" cols="60" placeholder="Describe the 
-issue..."></textarea><br>
- <input id="name" placeholder="Name" />
- <input id="contact" placeholder="Contact" />
- <button id="send">Submit</button>
- <pre id="resp"></pre>
- <script src="js/app.js"></script>
+    <header>
+        <div class="header-content">
+            <h1>CivicDoc</h1>
+            <p>AI-Powered Public Issue Prioritization & Governance Automation System</p>
+            <nav>
+                <ul>
+                    <li><a href="#" id="nav-home">Home</a></li>
+                    <li><a href="#" id="nav-circulars">View Circulars</a></li>
+                    <li><a href="#" id="nav-login">Login</a></li>
+                    <li><a href="#" id="nav-register">Register</a></li>
+                    <li id="nav-logout-li" style="display:none;"><a href="#" id="nav-logout">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Auth Section -->
+        <section id="auth-section" class="fade-section" style="display:none;">
+            <div id="login-form-container" class="form-container card">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="login_email">Email:</label>
+                        <input type="email" id="login_email" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login_password">Password:</label>
+                        <input type="password" id="login_password" name="password" required>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <pre id="loginResponse"></pre>
+            </div>
+
+            <div id="register-form-container" class="form-container card" style="display:none;">
+                <h2>Register</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="register_email">Email:</label>
+                        <input type="email" id="register_email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register_password">Password:</label>
+                        <input type="password" id="register_password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register_role">Role:</label>
+                        <select id="register_role" name="role">
+                            <option value="citizen">Citizen</option>
+                            <option value="department_admin">Department Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+                <pre id="registerResponse"></pre>
+            </div>
+        </section>
+
+        <!-- Complaint Section -->
+        <section id="complaint-submission-section" class="fade-section">
+            <h2>Submit a Complaint</h2>
+            <form id="complaintForm">
+                <div class="form-group">
+                    <label for="citizen_id">Citizen ID:</label>
+                    <input type="text" id="citizen_id" name="citizen_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Complaint Description:</label>
+                    <textarea id="description" name="description" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="language">Language (optional):</label>
+                    <input type="text" id="language" name="language">
+                </div>
+                <button type="submit">Submit Complaint</button>
+            </form>
+            <pre id="complaintResponse"></pre>
+        </section>
+
+        <!-- PDF Upload -->
+        <section id="pdf-upload-section" class="fade-section">
+            <h2>Upload Circular/PDF</h2>
+            <form id="pdfUploadForm">
+                <div class="form-group">
+                    <label for="pdfFile">Select PDF File:</label>
+                    <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                </div>
+                <button type="submit">Upload & Process PDF</button>
+            </form>
+            <pre id="pdfResponse"></pre>
+        </section>
+
+        <!-- Sorted Complaints Section (for Admin) -->
+        <section id="sorted-complaints-section" class="fade-section" style="display:none;">
+            <h2>Prioritized Complaints (Admin View)</h2>
+            <div id="sorted-complaints-list" class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Urgency</th>
+                            <th>Category</th>
+                            <th>Department</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th> <!-- New: Actions column for status update -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Complaints will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="sorted-complaints-message"></p>
+        </section>
+
+        <!-- View Circulars Section -->
+        <section id="circulars-display-section" class="fade-section">
+            <h2>View Circulars</h2>
+            <div id="circulars-list"></div>
+        </section>
+
+        <!-- Document Generation -->
+        <section id="document-generation-section" class="fade-section">
+            <h2>Generate Official Documents</h2>
+
+            <!-- RTI -->
+            <h3>Generate RTI Document</h3>
+            <form id="rtiForm">
+                <div class="form-group">
+                    <label for="rti_applicant_name">Applicant Name:</label>
+                    <input type="text" id="rti_applicant_name" name="applicant_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="rti_address">Address:</label>
+                    <input type="text" id="rti_address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="rti_info_sought">Information Sought:</label>
+                    <textarea id="rti_info_sought" name="information_sought" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rti_circular_id">Reference Circular ID (optional):</label>
+                    <input type="text" id="rti_circular_id" name="circular_id">
+                </div>
+                <div class="form-group">
+                    <label for="rti_complaint_id">Reference Complaint ID (optional):</label>
+                    <input type="text" id="rti_complaint_id" name="complaint_id">
+                </div>
+                <button type="submit">Generate RTI</button>
+            </form>
+
+            <div id="rtiOutputContainer" class="document-output rti-doc"></div>
+
+            <!-- Scheme -->
+            <h3>Generate Scheme Application</h3>
+            <form id="schemeAppForm">
+                <div class="form-group">
+                    <label for="scheme_applicant_name">Applicant Name:</label>
+                    <input type="text" id="scheme_applicant_name" name="applicant_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="scheme_address">Address:</label>
+                    <input type="text" id="scheme_address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="scheme_name">Scheme Name:</label>
+                    <input type="text" id="scheme_name" name="scheme_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="scheme_docs">Required Documents (comma-separated):</label>
+                    <input type="text" id="scheme_docs" name="required_documents">
+                </div>
+                <div class="form-group">
+                    <label for="scheme_circular_id">Reference Circular ID (optional):</label>
+                    <input type="text" id="scheme_circular_id" name="circular_id">
+                </div>
+                <button type="submit">Generate Scheme Application</button>
+            </form>
+
+            <div id="schemeAppResponse" class="document-output"></div>
+
+            <!-- Notice -->
+            <h3>Generate Official Notice</h3>
+            <form id="noticeForm">
+                <div class="form-group">
+                    <label for="notice_recipient">Recipient:</label>
+                    <input type="text" id="notice_recipient" name="recipient" required>
+                </div>
+                <div class="form-group">
+                    <label for="notice_sender">Sender:</label>
+                    <input type="text" id="notice_sender" name="sender" required>
+                </div>
+                <button type="submit">Generate Notice</button>
+            </form>
+
+            <div id="noticeResponse" class="document-output"></div>
+        </section>
+
+        <!-- Work Order -->
+        <h3>Generate Work Order</h3>
+        <form id="workOrderForm">
+            <div class="form-group">
+                <label for="work_order_issue_id">Issue ID (Complaint ID):</label>
+                <input type="text" id="work_order_issue_id" name="issue_id" required>
+            </div>
+            <div class="form-group">
+                <label for="work_order_dept">Assigned Department:</label>
+                <input type="text" id="work_order_dept" name="assigned_department" required>
+            </div>
+            <div class="form-group">
+                <label for="work_order_desc">Task Description:</label>
+                <textarea id="work_order_desc" name="task_description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="work_order_cost">Estimated Cost (optional):</label>
+                <input type="number" id="work_order_cost" name="estimated_cost">
+            </div>
+            <div class="form-group">
+                <label for="work_order_actions">Suggested Actions (comma-separated, optional):</label>
+                <input type="text" id="work_order_actions" name="suggested_actions">
+            </div>
+            <div class="form-group">
+                <label for="work_order_caller_name">Caller Name (optional):</label>
+                <input type="text" id="work_order_caller_name" name="caller_name">
+            </div>
+            <div class="form-group">
+                <label for="work_order_caller_contact">Caller Contact (optional):</label>
+                <input type="text" id="work_order_caller_contact" name="caller_contact">
+            </div>
+            <button type="submit">Generate Work Order</button>
+        </form>
+        <div id="workOrderResponse" class="document-output"></div>
+
+        <!-- Status Tracking -->
+        <section id="status-tracking-section" class="fade-section">
+            <h2>Track Complaint Status</h2>
+            <form id="statusTrackForm">
+                <div class="form-group">
+                    <label for="track_complaint_id">Complaint ID:</label>
+                    <input type="text" id="track_complaint_id" name="complaint_id" required>
+                </div>
+                <button type="submit">Track Status</button>
+            </form>
+            <pre id="statusResponse"></pre>
+        </section>
+
+    </div>
+
+    <script src="/static/js/app.js"></script>
  </body>
  </html>
+

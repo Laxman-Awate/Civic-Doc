@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheme Application - CivicDoc</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 20px; background-color: #f8f8f8; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; margin-bottom: 25px; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }
+        h2 { color: #0056b3; margin-top: 25px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        p { margin-bottom: 10px; }
+        .detail-item { margin-bottom: 8px; }
+        .label { font-weight: bold; color: #555; }
+        .ai-insight { background-color: #e0f7fa; border-left: 5px solid #00bcd4; padding: 15px; margin-top: 20px; border-radius: 8px; }
+        .ai-insight p { margin: 5px 0; }
+        ul { list-style-type: disc; margin-left: 20px; padding-left: 0; }
+        ul li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scheme Application: {{ scheme_name }}</h1>
+        
+        <p class="detail-item"><span class="label">Generated At:</span> {{ generated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        
+        <h2>Applicant Information</h2>
+        <p class="detail-item"><span class="label">Applicant Name:</span> {{ applicant_name }}</p>
+        <p class="detail-item"><span class="label">Address:</span> {{ address }}</p>
+        <p class="detail-item"><span class="label">Required Documents:</span> {{ required_documents | join(", ") }}</p>
+
+        {% if circular_id %}
+        <h2>AI-Powered Insights from Circular (ID: {{ circular_id }})</h2>
+        <div class="ai-insight">
+            {% if circular_summary %}<p class="detail-item"><span class="label">Circular Summary:</span> {{ circular_summary }}</p>{% endif %}
+            {% if eligibility_criteria %}<p class="detail-item"><span class="label">Eligibility Criteria:</span> {{ eligibility_criteria }}</p>{% endif %}
+            {% if deadlines %}<p class="detail-item"><span class="label">Deadlines:</span> {{ deadlines }}</p>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+
